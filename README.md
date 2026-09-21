@@ -35,6 +35,7 @@ No API key and no network: the model is a deterministic replay behind a real `In
 | Tool | Version | PASS | INCOMPLETE | FAIL |
 |---|---|---|---|---|
 | adk-tracegauge | 0.8.1 | 6 | 5 (G1, G2, G3, T1, M1) | 1 (A1 audio) |
+| adk-tracegauge | 0.9.0 patched build (`main` `9da795c`, unreleased) | 6 | 6 (G1, G2, G3, T1, A1, M1), all reported as incomplete by the tool | 0 |
 | adk-finops | 0.6.1 (commit `69ed257`) | 4 | 3 (G1, G2, T1) | 5 (C1, C4, C5, A1, M2) |
 
 Verbatim outputs are in `scorecards/`; the earlier five-case pass/fail scorecards are kept there,
@@ -73,6 +74,7 @@ done about it:
   neither handles (audio, tool-use tokens). They were committed before either tool was scored on them, and no
   case or rule was changed after scoring. adk-tracegauge dropped below full marks on them (see the
   scorecard); adk-finops also dropped, on the original five.
+- **After the first scoring (same day): the two adk-tracegauge findings that were silent wrong outputs (grounding fee omitted with no flag; audio priced at the text rate) were fixed in adk-tracegauge (#86, #87) and the tool was re-scored.** The fix flags them rather than pricing them, so those cases moved from FAIL / silent-INCOMPLETE to flagged-INCOMPLETE; no case or rule was changed, and the 0.8.1 scorecard is kept as scored. The adapter was changed to read the tool's own `total_is_complete` (see the scorecard header).
 
 **What these mitigations do not fix: the choice of cases.** The five cases are failure modes adk-tracegauge
 was built to handle, and they were chosen after the author had run a hands-on comparison and seen where

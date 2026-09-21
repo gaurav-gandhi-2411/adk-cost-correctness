@@ -6,6 +6,7 @@ names the tool version.
 | File | Tool | Version | Rule | Result |
 |---|---|---|---|---|
 | `2026-09-21_adk-tracegauge.md` | adk-tracegauge | 0.8.1 | three outcomes, 12 cases | 6 PASS / 5 INCOMPLETE / 1 FAIL |
+| `2026-09-21_adk-tracegauge_0.9.0-flagged.md` | adk-tracegauge | 0.9.0 patched build (`main` `9da795c`, unreleased) | three outcomes, 12 cases | 6 PASS / 6 INCOMPLETE (all flagged) / 0 FAIL |
 | `2026-09-21_adk-finops.md` | adk-finops | 0.6.1 (commit `69ed257`) | three outcomes, 12 cases | 4 PASS / 3 INCOMPLETE / 5 FAIL |
 | `2026-09-21_adk-tracegauge_five-cases-pass-fail-rule.md` | adk-tracegauge | 0.8.1 | superseded: pass/fail, original five cases | 5/5 |
 | `2026-09-21_adk-finops_five-cases-pass-fail-rule.md` | adk-finops | 0.6.1 | superseded: pass/fail, original five cases | 2/5 |

@@ -32,9 +32,14 @@ class AdkTracegaugeAdapter:
         return {"after_model_callback": self._plugin.after_model_callback}
 
     def collect(self, ctx: RunContext) -> Outcome:
+        from adk_tracegauge._report import to_json_dict
         from adk_tracegauge.snapshot import build_snapshot
 
         snap = build_snapshot(self._store)
         if snap.skipped and not snap.records:
             return Outcome(total_usd=None, flagged=True)
-        return Outcome(total_usd=sum(r.cost_usd for r in snap.records), flagged=bool(snap.skipped))
+        # `adk-tracegauge report --json`'s own fields: the priced total and whether the tool says
+        # that total is complete. 0.8.1 sets total_is_complete=False only for unknown invocations;
+        # 0.9.0 also sets it False for a priced invocation with a billed component left out.
+        body = to_json_dict(snap, "adk-cost-correctness")
+        return Outcome(total_usd=body["total_usd_priced"], flagged=not body["total_is_complete"])
