@@ -31,13 +31,18 @@ adk-cost-correctness run --adapter adk-finops
 
 No API key and no network: the model is a deterministic replay behind a real `InMemoryRunner`.
 
-## Scorecards (2026-09-21, google-adk 2.9.2, 12 graded cases)
+## Scorecards (2026-09-21, google-adk 2.9.2)
+
+**15 graded cases** (the 12 below plus the realistic twins G1r-G3r, committed before scoring). The 12-case rows are kept as scored.
 
 | Tool | Version | PASS | INCOMPLETE | FAIL |
 |---|---|---|---|---|
 | adk-tracegauge | 0.8.1 | 6 | 5 (G1, G2, G3, T1, M1) | 1 (A1 audio) |
 | adk-tracegauge | 0.9.0 patched build (`main` `9da795c`, unreleased) | 6 | 6 (G1, G2, G3, T1, A1, M1), all reported as incomplete by the tool | 0 |
 | adk-finops | 0.6.1 (commit `69ed257`) | 4 | 3 (G1, G2, T1) | 5 (C1, C4, C5, A1, M2) |
+| **15 cases:** adk-tracegauge | **0.9.0 published (PyPI)** | 6 | 8 (G1, G2, G3, G1r, G2r, T1, A1, M1) | **1 (G3r)**: the sub-agent call with tool-use tokens is reported unknown, so the flagged lower bound $0.0004344 is not a declared figure (see the scorecard) |
+| **15 cases:** adk-finops | **0.6.1 published (PyPI)** | 4 | 5 (G1, G2, G1r, G2r, T1) | 6 (C1, C4, C5, G3r, A1, M2): G3r applies the $0.014 per-query rate to a Gemini 2.5 call |
+| **15 cases:** adk-tracegauge | dev build of PR #91 (**not published**) | 6 | 9 (all flagged) | 0 |
 
 Verbatim outputs are in `scorecards/`; the earlier five-case pass/fail scorecards are kept there,
 marked with the rule they used. A scorecard scores one version of each tool on these cases. It says nothing

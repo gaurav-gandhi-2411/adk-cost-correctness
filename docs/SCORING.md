@@ -74,6 +74,15 @@ figures as PASS, via `also_pass_usd`: tool-use tokens left out (the expected fig
 input rate. Anything else is FAIL, and the fee omitted (tokens only, either treatment) is INCOMPLETE. This
 option exists only for those three cases.
 
+### Known gap in the rule: a flagged lower bound that omits a whole unknown invocation reads as FAIL
+
+Rule 4 gives FAIL to any figure that is neither the expected figure nor a declared incomplete figure. A tool
+that prices some of a multi-invocation case, reports the rest as UNKNOWN and says so ("the true total is at
+least this") therefore scores FAIL, although it is honest and not silent (published adk-tracegauge 0.9.0 on
+G3r: $0.0004344, flagged). This was found by the 2026-09-21 G3r run and the rule was **not changed after
+seeing it**: the result is reported as scored. A later, dated rule amendment (a flagged lower bound below the
+expected figure scores INCOMPLETE) is a decision for the suite's owner, to apply to new runs only.
+
 ## Harness sanity (S0)
 
 A plain single call. Not graded; if a tool fails it the adapter or fixture is broken and the scorecard is
