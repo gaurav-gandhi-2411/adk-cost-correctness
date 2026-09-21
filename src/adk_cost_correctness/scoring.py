@@ -111,6 +111,15 @@ def score(case: Case, outcome: Outcome) -> Score:
         )
     if _close(reported, expected):
         return Score(case.id, "PASS", f"${reported:.7f} matches", reported, expected)
+    if any(_close(reported, alt) for alt in case.also_pass_usd):
+        return Score(
+            case.id,
+            "PASS",
+            f"${reported:.7f} matches an accepted alternative (expected ${expected:.7f}; "
+            "the case's billing of one component is not established)",
+            reported,
+            expected,
+        )
     if any(_close(reported, partial) for partial in case.incomplete_usd):
         silent = "" if outcome.flagged else ", not flagged as incomplete"
         return Score(

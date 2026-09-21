@@ -13,6 +13,7 @@ scored by writing one small adapter.
 | C5 streaming partials | Cumulative usage on every streamed chunk is priced once. Replayed from a real Gemini stream. | original five |
 | G1 / G2 | Google Search grounding fee, Gemini 2.5 (per grounded prompt) and Gemini 3.x (per query), ADK's built-in tool. | counter-case |
 | G3 | The same fee through ADK's `GoogleSearchAgentTool` (the path a tool-callback fee hook can fire on). | counter-case |
+| G1r / G2r / G3r | G1-G3 rebuilt with the token counts of real Gemini 2.5 grounded responses, which always carry tool-use tokens (G1-G3 do not, so they are not representative of real responses). Tool-use tokens left out or folded in at the input rate both pass. | counter-case, added after real captures |
 | T1 | Tokens fetched by a built-in tool (URL context) are billed as input. | counter-case |
 | A1 | Audio input tokens have their own, higher rate. | counter-case |
 | M1 / M2 | A published price for a model outside a tool's table: gpt-4o, claude-opus-5. | counter-case |

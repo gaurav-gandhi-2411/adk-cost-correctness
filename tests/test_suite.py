@@ -65,6 +65,37 @@ def test_any_other_figure_is_a_fail():
     )  # audio at the text rate: wrong, not omitted
 
 
+def test_the_realistic_twins_accept_tool_use_tokens_left_out_or_folded_in_at_the_input_rate():
+    for case_id, expected, folded in [
+        ("G1r_grounding_gemini_2_5_real_shape", 0.0361907, 0.0362264),
+        ("G2r_grounding_gemini_3_real_shape", 0.032305, 0.0324835),
+        ("G3r_grounding_via_agent_tool_real_shape", 0.0371853, 0.0372249),
+    ]:
+        assert _v(case_id, total_usd=expected) == "PASS"
+        assert _v(case_id, total_usd=folded) == "PASS"  # billing of tool-use tokens not established
+        assert (
+            _v(case_id, total_usd=expected + 0.0001) == "FAIL"
+        )  # near, but neither accepted figure
+    # the fee omitted (tokens only, either treatment) is INCOMPLETE, not PASS
+    assert _v("G1r_grounding_gemini_2_5_real_shape", total_usd=0.0011907) == "INCOMPLETE"
+    assert _v("G1r_grounding_gemini_2_5_real_shape", total_usd=0.0012264) == "INCOMPLETE"
+    # no figure at all (the invocation reported unknown) is INCOMPLETE
+    assert (
+        _v("G3r_grounding_via_agent_tool_real_shape", total_usd=None, flagged=True) == "INCOMPLETE"
+    )
+
+
+def test_the_original_grounding_cases_are_not_accepting_alternatives():
+    # G1-G3 carry no tool-use tokens; also_pass_usd is only for the real-shape twins.
+    for case_id in (
+        "G1_grounding_gemini_2_5",
+        "G2_grounding_gemini_3",
+        "G3_grounding_via_agent_tool",
+    ):
+        assert _case(case_id).also_pass_usd == ()
+        assert _case(case_id).step.tool_use_prompt == 0
+
+
 def test_crashing_instead_of_answering_is_a_fail():
     assert _v("C3_thinking_tokens", total_usd=None, refused="RuntimeError: boom") == "FAIL"
 
@@ -90,6 +121,9 @@ def test_double_registration_passes_by_counting_once_or_by_refusing_and_fails_at
         ("G1_grounding_gemini_2_5", 0.03635),  # $0.00135 tokens + $0.035 (one grounded prompt)
         ("G2_grounding_gemini_3", 0.0477),  # $0.0057 tokens + 3 x $0.014
         ("G3_grounding_via_agent_tool", 0.02558),  # $0.01158 tokens + 1 x $0.014
+        ("G1r_grounding_gemini_2_5_real_shape", 0.0361907),  # $0.0011907 + $0.035
+        ("G2r_grounding_gemini_3_real_shape", 0.032305),  # $0.004305 + 2 x $0.014
+        ("G3r_grounding_via_agent_tool_real_shape", 0.0371853),  # $0.0021853 + $0.035
         ("T1_tool_use_prompt_tokens", 0.0023),  # (1,000 + 5,000) x $0.30/M + 200 x $2.50/M
         ("A1_audio_input", 0.00131),  # 200 text + 1,000 audio + 100 out
         ("M1_gpt_4o", 3.5),
@@ -116,6 +150,9 @@ def test_every_priced_case_names_its_vendor_source_and_the_case_origin_is_record
         "G1_grounding_gemini_2_5",
         "G2_grounding_gemini_3",
         "G3_grounding_via_agent_tool",
+        "G1r_grounding_gemini_2_5_real_shape",
+        "G2r_grounding_gemini_3_real_shape",
+        "G3r_grounding_via_agent_tool_real_shape",
         "T1_tool_use_prompt_tokens",
         "A1_audio_input",
         "M1_gpt_4o",
@@ -152,6 +189,9 @@ def test_the_naive_plugin_does_not_pass_the_cases_it_is_wrong_on():
         "G1_grounding_gemini_2_5",
         "G2_grounding_gemini_3",
         "G3_grounding_via_agent_tool",
+        "G1r_grounding_gemini_2_5_real_shape",
+        "G2r_grounding_gemini_3_real_shape",
+        "G3r_grounding_via_agent_tool_real_shape",
         "T1_tool_use_prompt_tokens",
         "A1_audio_input",
     ):

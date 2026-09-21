@@ -79,6 +79,9 @@ class Case:
     sources: tuple[str, ...] = ()
     # Figures that mean "priced, but a component the vendor publishes a price for was left out".
     incomplete_usd: tuple[float, ...] = ()
+    # Other figures that are ALSO fully correct, for a component whose billing is not established
+    # (server-side tool-use tokens: unpriced or folded in at the input rate are both defensible).
+    also_pass_usd: tuple[float, ...] = ()
     streaming: bool = False
     register_twice: bool = False
     verified_on_real_stream: bool = False
@@ -273,6 +276,113 @@ def all_cases() -> list[Case]:
                 "tool-callback fee hook (name-matched on 'google_search') can fire."
             ),
             sources=(GEMINI_PAGE, VERTEX_PAGE),
+        ),
+        # ---- realistic twins of G1-G3, added 2026-09-21 after real captures ---------------------
+        # G1-G3 set no tool_use_prompt_token_count. Every real Gemini 2.5 grounded response captured
+        # 2026-09-21 carried one (6 of 6, 115-148 tokens), so G1-G3 are NOT representative of real
+        # responses (docs/SCORING.md). The twins use the token counts of those real responses. Billing of
+        # tool-use tokens is not established (Vertex: Google Search grounding input tokens are not charged;
+        # the Gemini API is UNVERIFIED), so the expected figure leaves them out and a figure that folds them
+        # in at the input rate is also PASS (``also_pass_usd``). No real Gemini 3.x grounded response could be
+        # captured (free-tier key: 429), so G2r's 3.x token counts are the 2.5 capture's: UNVERIFIED for 3.x.
+        Case(
+            id="G1r_grounding_gemini_2_5_real_shape",
+            title="G1 with the token counts of a real gemini-2.5-flash google_search response",
+            # real capture A: prompt 44, candidates 39, thoughts 432, tool_use 119, two queries in one call
+            step=Step(
+                f, prompt=44, output=39, thoughts=432, tool_use_prompt=119, grounding_queries=2
+            ),
+            kind="cost",
+            origin="counter",
+            builtin_google_search=True,
+            # tokens: 44 x $0.30/M = $0.0000132 ; (39 + 432) x $2.50/M = $0.0011775 -> $0.0011907
+            # grounding: ONE grounded prompt = $0.035 (two queries, one charge) ; total $0.0361907
+            # tool-use tokens (119) left out ; folded in at $0.30/M they add $0.0000357 -> $0.0362264
+            expected_usd=_usd(f, 44, 0, 471) + GROUNDING_PER_PROMPT_GEMINI_2_5,
+            also_pass_usd=(_usd(f, 44 + 119, 0, 471) + GROUNDING_PER_PROMPT_GEMINI_2_5,),
+            incomplete_usd=(_usd(f, 44, 0, 471), _usd(f, 44 + 119, 0, 471)),
+            arithmetic=(
+                "tokens $0.0000132 + $0.0011775 = $0.0011907; one grounded prompt on 2.5 = $0.035; total "
+                "$0.0361907. The 119 tool-use tokens are not priced by the expected figure (billing not "
+                "established); at the input rate they would add $0.0000357 (also PASS)."
+            ),
+            sources=(
+                GEMINI_PAGE,
+                VERTEX_PAGE,
+                "real capture 2026-09-21, docs/design/data (adk-tracegauge)",
+            ),
+        ),
+        Case(
+            id="G2r_grounding_gemini_3_real_shape",
+            title="G2 with tool-use tokens (counts from the 2.5 capture; 3.x counts UNVERIFIED)",
+            step=Step(
+                g3, prompt=44, output=39, thoughts=432, tool_use_prompt=119, grounding_queries=2
+            ),
+            kind="cost",
+            origin="counter",
+            builtin_google_search=True,
+            # tokens: 44 x $1.50/M = $0.000066 ; 471 x $9.00/M = $0.004239 -> $0.004305
+            # grounding: 2 queries x $14/1,000 = $0.028 ; total $0.032305
+            # tool-use tokens (119) folded in at $1.50/M would add $0.0001785 -> $0.0324835
+            expected_usd=_usd(g3, 44, 0, 471) + 2 * GROUNDING_PER_QUERY_GEMINI_3,
+            also_pass_usd=(_usd(g3, 44 + 119, 0, 471) + 2 * GROUNDING_PER_QUERY_GEMINI_3,),
+            incomplete_usd=(_usd(g3, 44, 0, 471), _usd(g3, 44 + 119, 0, 471)),
+            arithmetic=(
+                "tokens $0.000066 + $0.004239 = $0.004305; Gemini 3.x bills each search request: 2 x "
+                "$14/1,000 = $0.028; total $0.032305. Tool-use tokens (119) not priced by the expected "
+                "figure; at $1.50/M they would add $0.0001785 (also PASS). The tool-use count is the 2.5 "
+                "capture's: no 3.x grounded response could be captured."
+            ),
+            sources=(
+                GEMINI_PAGE,
+                VERTEX_PAGE,
+                "real capture 2026-09-21 (2.5 shape), docs/design/data",
+            ),
+        ),
+        Case(
+            id="G3r_grounding_via_agent_tool_real_shape",
+            title="G3 through GoogleSearchAgentTool with the token counts of a real capture (2.5)",
+            # real capture C: root call 1 (116 / 20 / thoughts 46), sub-agent grounded call (78 / 143 /
+            # thoughts 548 / tool_use 132 / 1 query), root final call (357 / 33 / thoughts 18)
+            step=Step(f, prompt=116, output=20, thoughts=46, calls_tool="google_search_agent"),
+            sub_step=Step(
+                f, prompt=78, output=143, thoughts=548, tool_use_prompt=132, grounding_queries=1
+            ),
+            followup_step=Step(f, prompt=357, output=33, thoughts=18),
+            kind="cost",
+            origin="counter",
+            google_search_agent_tool=True,
+            # root 1: 116 x $0.30/M + 66 x $2.50/M = $0.0000348 + $0.000165 = $0.0001998
+            # sub-agent: 78 x $0.30/M + 691 x $2.50/M = $0.0000234 + $0.0017275 = $0.0017509
+            # root final: 357 x $0.30/M + 51 x $2.50/M = $0.0001071 + $0.0001275 = $0.0002346
+            # tokens $0.0021853 ; one grounded prompt $0.035 ; total $0.0371853
+            # sub-agent tool-use tokens (132) at $0.30/M would add $0.0000396 -> $0.0372249
+            expected_usd=(
+                _usd(f, 116, 0, 66)
+                + _usd(f, 78, 0, 691)
+                + _usd(f, 357, 0, 51)
+                + GROUNDING_PER_PROMPT_GEMINI_2_5
+            ),
+            also_pass_usd=(
+                _usd(f, 116, 0, 66)
+                + _usd(f, 78 + 132, 0, 691)
+                + _usd(f, 357, 0, 51)
+                + GROUNDING_PER_PROMPT_GEMINI_2_5,
+            ),
+            incomplete_usd=(
+                _usd(f, 116, 0, 66) + _usd(f, 78, 0, 691) + _usd(f, 357, 0, 51),
+                _usd(f, 116, 0, 66) + _usd(f, 78 + 132, 0, 691) + _usd(f, 357, 0, 51),
+            ),
+            arithmetic=(
+                "root $0.0001998 + sub-agent $0.0017509 + root final $0.0002346 = $0.0021853 in tokens; one "
+                "grounded prompt on 2.5 = $0.035; total $0.0371853. The 132 sub-agent tool-use tokens are not "
+                "priced by the expected figure; at the input rate they would add $0.0000396 (also PASS)."
+            ),
+            sources=(
+                GEMINI_PAGE,
+                VERTEX_PAGE,
+                "real capture 2026-09-21, docs/design/data (adk-tracegauge)",
+            ),
         ),
         Case(
             id="T1_tool_use_prompt_tokens",

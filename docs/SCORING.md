@@ -58,6 +58,22 @@ user, only that it is not the fully priced answer.
 G1 is ADK's real built-in `google_search`, which runs inside the model and fires no tool callbacks. G3 is
 ADK's `GoogleSearchAgentTool`, the path on which a callback-based fee hook keyed on the tool name can fire.
 
+### G1-G3 are not representative of real responses; G1r-G3r are (2026-09-21)
+
+G1-G3 set no `tool_use_prompt_token_count`. Real Gemini 2.5 Google Search responses captured 2026-09-21
+through ADK (6 of 6 grounded calls, adk-tracegauge repo `docs/design/data/real_grounding_2026-09-21.jsonl`)
+always carry one (115-148 tokens). G1-G3 are kept **unchanged** (cases are not adjusted after scoring) but
+they do not describe what a real grounded call looks like; read their results with that in mind. The twins
+**G1r-G3r** use the token counts of those real captures (G1r: capture A; G3r: capture C, root and sub-agent
+calls; G2r reuses the 2.5 counts because no Gemini 3.x grounded response could be captured with a free-tier
+key, so its tool-use count is UNVERIFIED for 3.x).
+
+Billing of tool-use tokens is not established (Vertex states Google Search grounding input tokens are not
+charged; the Gemini API is UNVERIFIED; the URL-context docs bill theirs as input). So the twins accept two
+figures as PASS, via `also_pass_usd`: tool-use tokens left out (the expected figure) or folded in at the
+input rate. Anything else is FAIL, and the fee omitted (tokens only, either treatment) is INCOMPLETE. This
+option exists only for those three cases.
+
 ## Harness sanity (S0)
 
 A plain single call. Not graded; if a tool fails it the adapter or fixture is broken and the scorecard is
