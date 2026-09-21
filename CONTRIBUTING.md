@@ -10,13 +10,16 @@ core promise: every expected figure is hand-computed and visible, and the suite 
      that file.** Do not compute the expected value by running a tool. If a number comes from a real API
      response, record the response in `src/adk_cost_correctness/data/` with provenance (model, date, how it
      was captured), as C5 does.
-   - `kind="cost"`: one correct dollar figure. `kind="unpriced"`: there is no correct figure and any reported
-     figure fails (see `docs/SCORING.md`). `kind="cost_or_refusal"`: a tool may also refuse.
-   - Do not add a case you have not seen fail on a real tool or on the naive plugin: a case that everything
-     passes measures nothing.
+   - `kind="cost"`: one correct dollar figure; add `incomplete_usd=` for each figure that means "priced, but a
+     published component was left out" (INCOMPLETE, not FAIL). `kind="unpriced"`: there is no correct figure
+     and any reported figure fails (see `docs/SCORING.md`). `kind="cost_or_refusal"`: a tool may also refuse.
+   - Mark `origin="counter"` for a case added to balance an earlier selection, and record `added_on`. Commit
+     new cases and rule changes BEFORE scoring any tool on them, and do not change them after.
+   - Check the case against the in-repo naive plugin: a case that everything passes measures nothing. Do not
+     score the tools you are grading on it before committing it.
 2. Make the in-repo plugins behave accordingly: `ReferencePlugin` must pass it, `NaivePlugin` must fail it
    for the reason the case exists (`adapters/reference.py`). Add the assertion to
-   `tests/test_suite.py` (`test_the_naive_plugin_fails_each_graded_case_for_its_reason`).
+   `tests/test_suite.py` (`test_the_naive_plugin_does_not_pass_the_cases_it_is_wrong_on`).
 3. If it needs a new scoring behaviour, change `scoring.py` and add unit tests with synthetic outcomes for
    both the pass and the fail side.
 4. Update the case table in `README.md` and the relevant section of `docs/SCORING.md`. Re-run every
