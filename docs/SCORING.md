@@ -74,15 +74,6 @@ figures as PASS, via `also_pass_usd`: tool-use tokens left out (the expected fig
 input rate. Anything else is FAIL, and the fee omitted (tokens only, either treatment) is INCOMPLETE. This
 option exists only for those three cases.
 
-### Known gap in the rule: a flagged lower bound that omits a whole unknown invocation reads as FAIL
-
-Rule 4 gives FAIL to any figure that is neither the expected figure nor a declared incomplete figure. A tool
-that prices some of a multi-invocation case, reports the rest as UNKNOWN and says so ("the true total is at
-least this") therefore scores FAIL, although it is honest and not silent (published adk-tracegauge 0.9.0 on
-G3r: $0.0004344, flagged). This was found by the 2026-09-21 G3r run and the rule was **not changed after
-seeing it**: the result is reported as scored. A later, dated rule amendment (a flagged lower bound below the
-expected figure scores INCOMPLETE) is a decision for the suite's owner, to apply to new runs only.
-
 ## Harness sanity (S0)
 
 A plain single call. Not graded; if a tool fails it the adapter or fixture is broken and the scorecard is
@@ -100,3 +91,21 @@ See the README disclosure and `git log`.
 Other providers beyond gpt-4o and claude-opus-5, long-context tiers, promo windows, Batch/Flex tiers,
 explicit-cache storage fees (billed on cache lifetime, not derivable from per-call usage), budget guards,
 exporters, dashboards. Absence from this suite is not a claim of correctness.
+
+## Scorer changelog
+
+Each entry names what the scorer did wrong, when it was found relative to results, and whether the rule text
+changed. The rule text above has not been edited by any entry.
+
+- **2026-09-21 -- scorer bug: a declared lower bound scored FAIL.** The rule as written says a figure that
+  omits a component, or a component reported unknown, when the vendor publishes a price, is INCOMPLETE. The
+  scorer only recognised a total as such when it equalled one of a case's pre-computed partial figures
+  (`incomplete_usd`) or when no figure was reported. On G3r, published adk-tracegauge 0.9.0 priced the two
+  root calls ($0.0004344), reported the grounded sub-agent invocation UNKNOWN and said the total excludes it;
+  that matches the written rule, but the figure equalled no pre-computed partial, so the scorer returned
+  FAIL. **The fix was made after seeing this result.** The scorer now scores a figure the tool has flagged
+  as leaving something out (`Outcome.flagged`) and that is below the expected figure as INCOMPLETE ("declared
+  lower bound"). A figure that is not flagged, or is above the expected one, still falls through to FAIL, and
+  a flagged figure equal to the expected one still passes. **The rule text was not changed** (this is the
+  scorer implementing it as already written). Test: `test_a_declared_lower_bound_is_incomplete_but_an_undeclared_wrong_figure_still_fails`.
+  Effect on published results, by re-scoring both tools: see `scorecards/`.

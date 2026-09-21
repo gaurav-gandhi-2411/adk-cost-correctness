@@ -130,6 +130,20 @@ def score(case: Case, outcome: Outcome) -> Score:
             reported,
             expected,
         )
+    if outcome.flagged and reported < expected:
+        # SCORING.md rule 3, as written: "unknown, or omitted, when a price is published" is INCOMPLETE.
+        # A total the tool itself declares a lower bound (it reported something UNKNOWN or unpriced
+        # and said the true total is at least this) is exactly that. It need not equal one of the
+        # case's pre-computed partial figures: a case with several invocations can be short by a
+        # whole unknown one. Undeclared (not flagged) or above-expected figures still fall through.
+        return Score(
+            case.id,
+            "INCOMPLETE",
+            f"${reported:.7f} is a declared lower bound: the tool flagged that it left something "
+            f"out (expected ${expected:.7f}, {reported / expected:.2f}x)",
+            reported,
+            expected,
+        )
     ratio = f"{reported / expected:.2f}x" if expected else "n/a"
     return Score(
         case.id,

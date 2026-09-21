@@ -96,6 +96,29 @@ def test_the_original_grounding_cases_are_not_accepting_alternatives():
         assert _case(case_id).step.tool_use_prompt == 0
 
 
+def test_a_declared_lower_bound_is_incomplete_but_an_undeclared_wrong_figure_still_fails():
+    # G3r on published adk-tracegauge 0.9.0: $0.0004344 with the tool saying it excluded an unknown
+    # invocation. A flagged figure below the expected one is the rule's "unknown or omitted" -> INCOMPLETE,
+    # even though it equals none of the case's pre-computed partial figures.
+    case_id = "G3r_grounding_via_agent_tool_real_shape"
+    declared = score(_case(case_id), Outcome(total_usd=0.0004344, flagged=True))
+    assert declared.verdict == "INCOMPLETE" and "declared lower bound" in declared.reason
+    # the very same figure, not declared: an undeclared wrong number is still a FAIL
+    assert _v(case_id, total_usd=0.0004344) == "FAIL"
+    assert _v(case_id, total_usd=0.0004344, flagged=False) == "FAIL"
+    # flagged, but ABOVE the expected figure, is not a lower bound: FAIL
+    assert _v(case_id, total_usd=0.05, flagged=True) == "FAIL"
+    # a flagged figure that IS the expected one still passes, and a flagged declared partial is unchanged
+    assert _v(case_id, total_usd=0.0371853, flagged=True) == "PASS"
+    assert _v("C3_thinking_tokens", total_usd=0.00055, flagged=True) == "INCOMPLETE"
+    # the wrong-rate FAIL stays a FAIL when the tool does not flag it (audio at the text rate)
+    assert _v("A1_audio_input", total_usd=0.00061) == "FAIL"
+
+
+def test_the_scorer_fix_does_not_touch_the_unpriceable_case():
+    assert _v("C1_unknown_model", total_usd=0.55, flagged=True) == "FAIL"
+
+
 def test_crashing_instead_of_answering_is_a_fail():
     assert _v("C3_thinking_tokens", total_usd=None, refused="RuntimeError: boom") == "FAIL"
 
