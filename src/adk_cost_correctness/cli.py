@@ -6,6 +6,7 @@ import argparse
 import importlib
 import json
 import sys
+from collections import Counter
 
 from .cases import all_cases
 from .harness import run_all
@@ -32,30 +33,26 @@ def main(argv: list[str] | None = None) -> int:
     scores = run_all(adapter)
     sanity = next(s for s in scores if s.case_id == "S0_sanity")
     graded = [s for s in scores if s.case_id != "S0_sanity"]
-    passed = sum(s.passed for s in graded)
+    tally = Counter(s.verdict for s in graded)
 
     if args.json:
-        print(
-            json.dumps(
-                {
-                    "tool": adapter.version(),
-                    "sanity_passed": sanity.passed,
-                    "passed": passed,
-                    "of": len(graded),
-                    "cases": [s.__dict__ for s in scores],
-                },
-                indent=2,
-            )
-        )
+        payload = {
+            "tool": adapter.version(),
+            "sanity_passed": sanity.passed,
+            "tally": {v: tally.get(v, 0) for v in ("PASS", "INCOMPLETE", "FAIL")},
+            "of": len(graded),
+            "cases": [{**s.__dict__, "origin": cases[s.case_id].origin} for s in scores],
+        }
+        print(json.dumps(payload, indent=2))
     else:
         print(f"Scorecard: {adapter.version()}")
-        print(f"{'case':26} {'result':6} detail")
+        print(f"{'case':30} {'origin':9} {'result':11} detail")
         for s in scores:
-            print(f"{s.case_id:26} {'PASS' if s.passed else 'FAIL':6} {s.reason}")
+            print(f"{s.case_id:30} {cases[s.case_id].origin:9} {s.verdict:11} {s.reason}")
         print(
-            f"\n{passed}/{len(graded)} graded cases passed"
-            f" (sanity {'ok' if sanity.passed else 'FAILED: scorecard invalid'});"
-            f" streaming fixture verified on a real stream: {cases['C5_streaming_partials'].verified_on_real_stream}"
+            f"\nPASS {tally.get('PASS', 0)} / INCOMPLETE {tally.get('INCOMPLETE', 0)} / "
+            f"FAIL {tally.get('FAIL', 0)} of {len(graded)} graded cases"
+            f" (sanity {'ok' if sanity.passed else 'FAILED: scorecard invalid'})"
         )
     return 0 if sanity.passed else 2
 

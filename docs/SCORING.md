@@ -1,47 +1,77 @@
 # Scoring rule
 
-A case is **PASS** or **FAIL**. There is no partial credit and no "close enough" outside the tolerance
-below. Every expected figure is hand-computed in `src/adk_cost_correctness/cases.py`, from one rate
-set (Gemini Developer API, `gemini-2.5-flash`: $0.30 in, $2.50 out, $0.03 cached, per 1M tokens).
+Every case ends in one of **three outcomes**:
 
-## Cases that have a correct dollar figure (S0, C2, C3, C5)
+| Outcome | Meaning |
+|---|---|
+| **PASS** | The correct figure; or "no figure" when no vendor publishes a price for the thing being priced. |
+| **INCOMPLETE** | "Unknown", or a figure that omits a component, when the vendor DOES publish a price for it. An undercount that is missing something rather than wrong about something. |
+| **FAIL** | Any other figure, including **any figure for a genuinely unpriceable component**, and a run that crashed instead of answering (except where refusing is the correct answer, C4). |
 
-PASS iff the tool reports a total within **$0.0000005** of the expected figure. That tolerance is only
-there because some tools round each call to 7 decimals. A tool that reports no figure, or raises,
-FAILS.
+A tool that is never wrong but often incomplete is not "perfect": it ships numbers users cannot fully
+trust as totals. A tool that always answers but is sometimes wrong is not "complete". The three-way split
+keeps those two failures apart, so a fail-closed tool cannot look flawless by declining to answer, and a
+tool that answers everything cannot hide its wrong figures behind coverage.
 
-## The unknown-model case (C1): a guess fails, even a close one
+## How a figure is classified
+
+Every expected figure is hand-computed in `src/adk_cost_correctness/cases.py`, from vendor prices read
+from the vendor's own page (each case lists its sources and the date read).
+
+1. Within **$0.0000005** of the expected figure -> PASS. (Some tools round each call to 7 decimals; that
+   is not a defect.)
+2. Within the same tolerance of a declared **incomplete figure** (the total with one published component
+   left out: thinking tokens, cached tokens, a grounding fee, tool-use tokens, audio) -> INCOMPLETE. The
+   scorecard says whether the tool flagged the omission or stayed silent; the outcome is the same.
+3. No figure for a priced case (or the tool marked it unknown and reported nothing) -> INCOMPLETE.
+4. Anything else -> FAIL. A component priced at the **wrong rate** is a wrong figure, not an omission
+   (audio at the text rate, C-case A1, is FAIL).
+
+## The unpriceable case (C1): a guess fails, even a close one
 
 The fixture's model (`acme-llm-7b`) has no published price, so there is no correct figure to be near.
-**A tool that reports ANY dollar figure for it FAILS** -- a $0.30/$2.50 fallback, a "similar model"
-rate, a default, or $0.00. It fails even if the figure happens to be close to what some real model would
-cost, and even if the tool also flags the model as unknown while still including the number.
+**Any figure reported for it FAILS** -- a fallback rate, a "similar model", a default, or $0.00 -- even if
+it lands close and even if the tool also flags the model as unknown while still including the number.
+PASS iff the tool reports no figure for the call. Reason: a cost tool's number is what people budget
+against; "how close" depends on a model nobody can name, so the only honest output is "unknown".
 
-PASS iff the tool reports no figure for the call: it marks it unknown, excludes it from its total, or
-refuses to continue. Reason: a cost tool's number is what people budget against. A wrong number that is
-labelled as an estimate elsewhere in the UI is still the number that gets used, and "how close" depends on
-a model nobody can name, so the only honest output is "unknown". The fixture would be pointless if
-closeness could rescue it: a fallback that lands within 1% on this fixture would be wrong by 10x on the
-next model.
+This rule applies to genuinely unpriceable components ONLY. It is not a license to answer "unknown" for
+something that has a published price: that is INCOMPLETE (rule 3), which is what the counter-cases test.
 
 ## Double registration (C4)
 
-The same plugin is registered twice on one agent (the plugin and its own callback). PASS iff the run is
-refused with an error, or the total equals a **single** count. FAIL at 2x (or anything else).
+PASS iff the run is refused with an error, or the total equals a single count. FAIL at 2x.
 
 ## Streaming (C5)
 
-Replays a real recorded stream (`data/real_stream_gemini-2.5-flash_2026-09-21.json`): six partial chunks
-with cumulative usage, then a final response with the same usage as the last chunk. PASS iff the total is
-the price of one call. This case is graded only because the assumption behind it -- that partials carry
-cumulative usage -- was verified against a real stream on 2026-09-21 (see the fixture's `_provenance`).
+Replays a real recorded Gemini stream (partials carry cumulative usage; the final response repeats the
+last partial's). PASS iff the total is the price of one call.
+
+## Grounding, tool-use tokens, audio, other vendors' models (G1-G3, T1, A1, M1, M2)
+
+Grounding fees apply past a free allowance (Gemini 2.5: 1,500 prompts/day; Gemini 3.x: 5,000 requests per
+month). A plugin cannot see an account's remaining allowance, so these cases price a request PAST the
+allowance at the published paid rate. A tool that (reasonably) assumes the free tier reports the
+"fee omitted" figure and scores INCOMPLETE; the suite does not claim that assumption is wrong for a given
+user, only that it is not the fully priced answer.
+
+G1 is ADK's real built-in `google_search`, which runs inside the model and fires no tool callbacks. G3 is
+ADK's `GoogleSearchAgentTool`, the path on which a callback-based fee hook keyed on the tool name can fire.
 
 ## Harness sanity (S0)
 
-A plain single call. It is not graded; if a tool fails it, the adapter or the fixture is broken and the
-scorecard is invalid (`adk-cost-correctness run` exits 2).
+A plain single call. Not graded; if a tool fails it the adapter or fixture is broken and the scorecard is
+invalid (`adk-cost-correctness run` exits 2).
+
+## Order of events (2026-09-21)
+
+The original five cases (C1-C5) were written after the author had seen where one of the scored tools fell
+short. The counter-cases and this three-outcome rule were written afterwards, and committed BEFORE the
+tools were scored on them; the results were not consulted and no case or rule was changed after scoring.
+See the README disclosure and `git log`.
 
 ## What the suite does not cover
 
-Other providers' pricing, long-context tiers, promo windows, grounding/tool fees, multi-agent rollup,
-Batch/Flex tiers, budget guards, exporters. Absence from this suite is not a claim of correctness.
+Other providers beyond gpt-4o and claude-opus-5, long-context tiers, promo windows, Batch/Flex tiers,
+explicit-cache storage fees (billed on cache lifetime, not derivable from per-call usage), budget guards,
+exporters, dashboards. Absence from this suite is not a claim of correctness.

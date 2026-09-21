@@ -17,6 +17,11 @@ from google.adk.apps.app import App
 from google.adk.models.base_llm import BaseLlm
 from google.adk.models.llm_response import LlmResponse
 from google.adk.runners import InMemoryRunner
+from google.adk.tools.google_search_agent_tool import (
+    GoogleSearchAgentTool,
+    create_google_search_agent,
+)
+from google.adk.tools.google_search_tool import google_search
 from google.genai import types as T
 
 from .adapters.base import CostPluginAdapter, RunContext
@@ -25,25 +30,60 @@ from .scoring import Score, score
 
 
 def _usage(step: Step, output: int, *, final: bool) -> Any:
+    details = None
+    if step.audio_prompt:
+        details = [
+            T.ModalityTokenCount(
+                modality=T.MediaModality.TEXT, token_count=step.prompt - step.audio_prompt
+            ),
+            T.ModalityTokenCount(modality=T.MediaModality.AUDIO, token_count=step.audio_prompt),
+        ]
+    tool_use = step.tool_use_prompt or None
     return T.GenerateContentResponseUsageMetadata(
         prompt_token_count=step.prompt,
         candidates_token_count=output,
         cached_content_token_count=step.cached or None,
         thoughts_token_count=(step.thoughts or None) if final else None,
-        total_token_count=step.prompt + output + (step.thoughts if final else 0),
+        tool_use_prompt_token_count=tool_use if final else None,
+        prompt_tokens_details=details,
+        total_token_count=(
+            step.prompt + output + ((step.thoughts + step.tool_use_prompt) if final else 0)
+        ),
     )
 
 
-def _replay_model(step: Step) -> BaseLlm:
+def _content(step: Step) -> Any:
+    if step.calls_tool:
+        part = T.Part(
+            function_call=T.FunctionCall(id="c1", name=step.calls_tool, args={"request": "q"})
+        )
+    else:
+        part = T.Part(text="ok")
+    return T.Content(role="model", parts=[part])
+
+
+def _replay_model(steps: list[Step], *, name: str = "replay-fake") -> BaseLlm:
+    """Serves ``steps`` in order, one per model call."""
+
     class Replay(BaseLlm):
-        model: str = "replay-fake"
+        model: str = name
+        _n: int = 0
 
         @classmethod
         def supported_models(cls) -> list[str]:
-            return ["replay-fake"]
+            return [name]
 
         async def generate_content_async(self, llm_request: Any, stream: bool = False) -> Any:
-            content = T.Content(role="model", parts=[T.Part(text="ok")])
+            step = steps[min(self._n, len(steps) - 1)]
+            self._n += 1
+            content = _content(step)
+            grounding = (
+                T.GroundingMetadata(
+                    web_search_queries=[f"q{i}" for i in range(step.grounding_queries)]
+                )
+                if step.grounding_queries
+                else None
+            )
             for cumulative_out in step.partial_outputs:  # Gemini reports cumulative usage per chunk
                 yield LlmResponse(
                     model_version=step.model,
@@ -54,17 +94,42 @@ def _replay_model(step: Step) -> BaseLlm:
             yield LlmResponse(
                 model_version=step.model,
                 content=content,
+                grounding_metadata=grounding,
                 usage_metadata=_usage(step, step.output, final=True),
             )
 
     return Replay()
 
 
+def _build_agent(case: Case, extra: dict[str, Any]) -> LlmAgent:
+    if case.google_search_agent_tool:
+        assert case.sub_step is not None
+        sub_model = _replay_model([case.sub_step], name=case.sub_step.model)
+        tool = GoogleSearchAgentTool(create_google_search_agent(sub_model))
+        assert case.followup_step is not None
+        root_steps = [case.step, case.followup_step]
+        return LlmAgent(
+            name="root_agent",
+            model=_replay_model(root_steps, name=case.step.model),
+            instruction="Use the search tool.",
+            tools=[tool],
+        )
+    kwargs: dict[str, Any] = dict(extra)
+    model_name = "replay-fake"
+    if case.builtin_google_search:
+        kwargs["tools"] = [google_search]  # ADK's real built-in tool; it checks the model name
+        model_name = case.step.model
+    return LlmAgent(
+        name="root_agent",
+        model=_replay_model([case.step], name=model_name),
+        instruction="Reply.",
+        **kwargs,
+    )
+
+
 async def _run(case: Case, adapter: CostPluginAdapter) -> tuple[str | None, RunContext]:
     extra = adapter.agent_kwargs() if case.register_twice else {}
-    agent = LlmAgent(
-        name="root_agent", model=_replay_model(case.step), instruction="Reply.", **extra
-    )
+    agent = _build_agent(case, extra)
     app = App(name="cost_correctness", root_agent=agent, plugins=adapter.plugins())
     runner = InMemoryRunner(app=app)
     session = await runner.session_service.create_session(app_name=app.name, user_id="u")
