@@ -1,5 +1,7 @@
 # Scorecard: adk-tracegauge 0.9.0, PUBLISHED wheel, 15 graded cases (with G1r-G3r)
 
+> **Superseded for G3r** by `2026-09-21_adk-tracegauge_0.9.0-published_15cases_scorerfix.md`: the FAIL below was a scorer bug (a declared lower bound scored FAIL), fixed after seeing this result; the rule text is unchanged. The sentence about a "gap in the rule" in the header below is superseded by SCORING.md's scorer changelog. Output kept as scored.
+
 Run 2026-09-21 against `adk-tracegauge==0.9.0` installed from PyPI (tag `v0.9.0` = `9da795c`), google-adk 2.9.2, suite commit `160507c` (the realistic twins G1r-G3r were committed BEFORE this run; no case or rule changed after). **G3r is FAIL and the reason matters:** the tool reported $0.0004344 with `total_is_complete: false` (the grounded sub-agent invocation carries tool-use tokens and is reported UNKNOWN by 0.9.0, so only the two root calls are priced; the report says the total EXCLUDES 1 unknown invocation and is at least that). The scoring rule as written gives FAIL to any figure that is not the expected figure or a declared incomplete figure, even when the tool flags it as a lower bound; that gap in the rule was NOT changed after seeing the result. See docs/SCORING.md.
 
 ```
