@@ -1,5 +1,5 @@
 {
-  "_provenance": "Recorded from a REAL streaming call on 2026-09-21: google-adk 2.9.2, model gemini-2.5-flash, Gemini Developer API (GOOGLE_API_KEY), SSE streaming, thinking_budget=0, max_output_tokens=300, prompt: 'List five European capital cities, one per line, each with a one-sentence fact.'. 'adk_callback_rows' is verbatim what ADK passed to after_model_callback. 'raw_genai_stream' is the same kind of call made directly with google-genai (a separate call: prompt_token_count is 19 there and 38 through ADK; why they differ was not investigated, UNVERIFIED).",
+  "_provenance": "Recorded from a REAL streaming call on 2026-09-21: google-adk 2.9.2, model gemini-2.5-flash, Gemini Developer API (GOOGLE_API_KEY), SSE streaming, thinking_budget=0, max_output_tokens=300, prompt: 'List five European capital cities, one per line, each with a one-sentence fact.'. 'adk_callback_rows' is verbatim what ADK passed to after_model_callback. 'raw_genai_stream' is the same kind of call made directly with google-genai (a separate call with no system instruction: prompt_token_count 19 there vs 38 through ADK, because ADK adds a system instruction; resolved and verified in docs/FIXTURE_PROVENANCE.md).",
   "adk_callback_rows": [
     {
       "partial": true,
