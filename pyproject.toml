@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adk-cost-correctness"
+version = "0.1.0"
+description = "A tool-agnostic correctness suite for Google ADK cost-tracking plugins: unknown models, cached tokens, thinking tokens, double registration, streaming partials. Deterministic fixtures, hand-computed expected costs, one adapter per tool."
+requires-python = ">=3.10"
+readme = "README.md"
+license = "Apache-2.0"
+dependencies = ["google-adk>=2.6.0,<2.10.0"]
+
+[project.optional-dependencies]
+# Adapters for the tools under test; the suite itself needs none of them.
+adk-tracegauge = ["adk-tracegauge>=0.8.1"]
+adk-finops = ["adk-finops==0.6.1"]
+
+[project.scripts]
+adk-cost-correctness = "adk_cost_correctness.cli:main"
+
+[dependency-groups]
+dev = ["ruff>=0.15,<1", "mypy>=1.14,<3", "pytest>=9.0.3,<10"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+adk_cost_correctness = ["data/*.json"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+# E501: `ruff format` keeps code within 100 columns; the long lines left are prose and the hand
+# arithmetic in case comments, which read worse wrapped mid-formula.
+ignore = ["E501"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+ignore_missing_imports = true  # google-adk/google-genai and the tools under test are partly untyped
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

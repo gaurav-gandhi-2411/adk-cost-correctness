@@ -1,0 +1,238 @@
+{
+  "_provenance": "Recorded from a REAL streaming call on 2026-09-21: google-adk 2.9.2, model gemini-2.5-flash, Gemini Developer API (GOOGLE_API_KEY), SSE streaming, thinking_budget=0, max_output_tokens=300, prompt: 'List five European capital cities, one per line, each with a one-sentence fact.'. 'adk_callback_rows' is verbatim what ADK passed to after_model_callback. 'raw_genai_stream' is the same kind of call made directly with google-genai (a separate call: prompt_token_count is 19 there and 38 through ADK; why they differ was not investigated, UNVERIFIED).",
+  "adk_callback_rows": [
+    {
+      "partial": true,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 4,
+        "prompt_token_count": 38,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 38
+          }
+        ],
+        "total_token_count": 42
+      },
+      "text_chars": 10
+    },
+    {
+      "partial": true,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 22,
+        "prompt_token_count": 38,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 38
+          }
+        ],
+        "total_token_count": 60
+      },
+      "text_chars": 75
+    },
+    {
+      "partial": true,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 71,
+        "prompt_token_count": 38,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 38
+          }
+        ],
+        "total_token_count": 109
+      },
+      "text_chars": 197
+    },
+    {
+      "partial": true,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 120,
+        "prompt_token_count": 38,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 38
+          }
+        ],
+        "total_token_count": 158
+      },
+      "text_chars": 235
+    },
+    {
+      "partial": true,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 168,
+        "prompt_token_count": 38,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 38
+          }
+        ],
+        "total_token_count": 206
+      },
+      "text_chars": 223
+    },
+    {
+      "partial": true,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 205,
+        "prompt_token_count": 38,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 38
+          }
+        ],
+        "total_token_count": 243
+      },
+      "text_chars": 173
+    },
+    {
+      "partial": false,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 205,
+        "prompt_token_count": 38,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 38
+          }
+        ],
+        "total_token_count": 243
+      },
+      "text_chars": 913
+    }
+  ],
+  "raw_genai_stream": [
+    {
+      "i": 0,
+      "text_chars": 10,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 4,
+        "prompt_token_count": 19,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 19
+          }
+        ],
+        "total_token_count": 23
+      },
+      "finish_reason": null
+    },
+    {
+      "i": 1,
+      "text_chars": 65,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 21,
+        "prompt_token_count": 19,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 19
+          }
+        ],
+        "total_token_count": 40
+      },
+      "finish_reason": null
+    },
+    {
+      "i": 2,
+      "text_chars": 237,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 70,
+        "prompt_token_count": 19,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 19
+          }
+        ],
+        "total_token_count": 89
+      },
+      "finish_reason": null
+    },
+    {
+      "i": 3,
+      "text_chars": 256,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 118,
+        "prompt_token_count": 19,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 19
+          }
+        ],
+        "total_token_count": 137
+      },
+      "finish_reason": null
+    },
+    {
+      "i": 4,
+      "text_chars": 249,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 166,
+        "prompt_token_count": 19,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 19
+          }
+        ],
+        "total_token_count": 185
+      },
+      "finish_reason": null
+    },
+    {
+      "i": 5,
+      "text_chars": 255,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 214,
+        "prompt_token_count": 19,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 19
+          }
+        ],
+        "total_token_count": 233
+      },
+      "finish_reason": null
+    },
+    {
+      "i": 6,
+      "text_chars": 10,
+      "model_version": "gemini-2.5-flash",
+      "usage_metadata": {
+        "candidates_token_count": 218,
+        "prompt_token_count": 19,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 19
+          }
+        ],
+        "total_token_count": 237
+      },
+      "finish_reason": "FinishReason.STOP"
+    }
+  ]
+}
