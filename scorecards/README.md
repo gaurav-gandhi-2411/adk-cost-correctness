@@ -17,6 +17,7 @@ names the tool version.
 | `2026-09-21_adk-finops.md` | adk-finops | 0.6.1 (commit `69ed257`) | three outcomes, 12 cases | 4 PASS / 3 INCOMPLETE / 5 FAIL |
 | `2026-09-21_adk-tracegauge_five-cases-pass-fail-rule.md` | adk-tracegauge | 0.8.1 | superseded: pass/fail, original five cases | 5/5 |
 | `2026-09-21_adk-finops_five-cases-pass-fail-rule.md` | adk-finops | 0.6.1 | superseded: pass/fail, original five cases | 2/5 |
+| `2026-09-23_adk-finops_0.6.3_15cases.md` | adk-finops | 0.6.3 PUBLISHED (retest after issue replies) | three outcomes, 15 cases | 5 PASS / 5 INCOMPLETE / 5 FAIL |
 
 The two superseded files are kept for history: they used the first rule and only the five cases chosen after
 the fact (see the README disclosure).
@@ -31,9 +32,24 @@ and the version tested:
 - C4 double registration counted twice with no warning: https://github.com/dmoonat/adk-finops/issues/2
 - C5 streaming partials each recorded: https://github.com/dmoonat/adk-finops/issues/3
 
-As of the date the suite was prepared for publication these had not been answered; the maintainers'
-response, if any, and any fix should be recorded here before the scorecard is published or re-run against a
-newer release. A scorecard is a statement about one version on one date.
+**Status as of 2026-09-23, after retesting 0.6.3 (see `2026-09-23_adk-finops_0.6.3_15cases.md`):**
+
+- **Issue #3 (streaming) — FIXED**, commit `38cbad874a420f4a41ba56efd740e1d143aa6e1f`, 2026-09-21.
+  Verified: the real-stream fixture now reports $0.0005239, matching expected exactly (was $0.0020673,
+  3.95x). Maintainer replied 2026-09-21 confirming the fix; retest reply posted
+  https://github.com/dmoonat/adk-finops/issues/3#issuecomment-5788530223.
+- **Issue #1 (unknown model) — NOT FIXED (partial).** Commit `d43d8b247aa09c7815c80090960f5b95ab614a9c`,
+  2026-09-21, adds a one-time logged/printed warning and an internal `is_fallback` flag, but the reported
+  total still carries the fallback dollar figure unflagged ($0.5500000 for `claude-opus-5`, still FAIL
+  under the suite's rule). Retest reply posted
+  https://github.com/dmoonat/adk-finops/issues/1#issuecomment-5788531028.
+- **Issue #2 (double registration) — NOT FIXED (docs only).** Commit
+  `f0569737a3ebd91dbe4efd219817a312db9f8d78`, 2026-09-21, adds a README warning; no runtime detection or
+  refusal. Retest still shows $0.0016000 (2.00x) against expected $0.0008000. Retest reply posted
+  https://github.com/dmoonat/adk-finops/issues/2#issuecomment-5788531285.
+
+A scorecard is a statement about one version on one date; the 2026-09-21 (0.6.1) scorecards are kept as
+scored, and `2026-09-23_adk-finops_0.6.3_15cases.md` supersedes them for the current release.
 
 **adk-finops G3r (2026-09-21), recorded here and NOT filed as an issue** (its first three issues are unanswered): through `GoogleSearchAgentTool` on a Gemini 2.5 call it reported $0.0161853 = tokens $0.0021853 + $0.014, the Gemini 3.x per-query grounding rate applied to a 2.5 call; the published 2.5 fee is $35 per 1,000 grounded prompts ($0.035), so the figure is 0.44x of the expected $0.0371853.
 

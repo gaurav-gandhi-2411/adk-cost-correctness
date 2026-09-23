@@ -43,6 +43,7 @@ No API key and no network: the model is a deterministic replay behind a real `In
 | **15 cases:** adk-tracegauge | **0.9.0 published (PyPI)**, scorer fixed | 6 | 9 (G1, G2, G3, G1r, G2r, G3r, T1, A1, M1) | 0. G3r is INCOMPLETE: 0.9.0 reported the tool-use sub-agent invocation unknown and said the total excludes it (a declared lower bound). It scored FAIL under a scorer bug, fixed after seeing it; see `docs/SCORING.md`'s scorer changelog |
 | **15 cases:** adk-tracegauge | **0.9.1 published (PyPI)** | 6 | 9 (G1, G2, G3, G1r, G2r, G3r, T1, A1, M1); every real-shape grounded twin now prices its tokens and reports the tool-use tokens and the grounding fee as flagged | 0 |
 | **15 cases:** adk-finops | **0.6.1 published (PyPI)** | 4 | 5 (G1, G2, G1r, G2r, T1) | 6 (C1, C4, C5, G3r, A1, M2): G3r applies the Gemini 3.x $0.014 per-query rate to a Gemini 2.5 call (not reported upstream) |
+| **15 cases:** adk-finops | **0.6.3 published (PyPI)**, after issues #1-#3 replies | 5 | 5 (G1, G2, G1r, G2r, T1) | 5 (C1, C4, G3r, A1, M2): C5 moved FAIL→PASS (streaming fix, issue #3, confirmed); C1 and C4 unchanged (issues #1/#2 partial/not fixed — see `scorecards/README.md`) |
 | **15 cases:** adk-tracegauge | dev build of PR #91 (**not published**) | 6 | 9 (all flagged) | 0 |
 
 Verbatim outputs are in `scorecards/`; the earlier five-case pass/fail scorecards are kept there,
