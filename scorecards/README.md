@@ -18,6 +18,7 @@ names the tool version.
 | `2026-09-21_adk-tracegauge_five-cases-pass-fail-rule.md` | adk-tracegauge | 0.8.1 | superseded: pass/fail, original five cases | 5/5 |
 | `2026-09-21_adk-finops_five-cases-pass-fail-rule.md` | adk-finops | 0.6.1 | superseded: pass/fail, original five cases | 2/5 |
 | `2026-09-23_adk-finops_0.6.3_15cases.md` | adk-finops | 0.6.3 PUBLISHED (retest after issue replies) | three outcomes, 15 cases | 5 PASS / 5 INCOMPLETE / 5 FAIL |
+| `2026-10-05_adk-finops_1.0.3_15cases.md` | adk-finops | 1.0.3 PUBLISHED (latest release) | three outcomes, 15 cases | 5 PASS / 5 INCOMPLETE / 5 FAIL (identical to 0.6.3) |
 
 The two superseded files are kept for history: they used the first rule and only the five cases chosen after
 the fact (see the README disclosure).
@@ -51,7 +52,7 @@ and the version tested:
 A scorecard is a statement about one version on one date; the 2026-09-21 (0.6.1) scorecards are kept as
 scored, and `2026-09-23_adk-finops_0.6.3_15cases.md` supersedes them for the current release.
 
-**adk-finops G3r (2026-09-21), recorded here and NOT filed as an issue** (its first three issues are unanswered): through `GoogleSearchAgentTool` on a Gemini 2.5 call it reported $0.0161853 = tokens $0.0021853 + $0.014, the Gemini 3.x per-query grounding rate applied to a 2.5 call; the published 2.5 fee is $35 per 1,000 grounded prompts ($0.035), so the figure is 0.44x of the expected $0.0371853.
+**adk-finops G3r (2026-09-21), recorded here and NOT filed as an issue** (its first three issues were answered by the maintainer on 2026-09-21 and 2026-09-23; see the quotes in the 2026-10-05 scorecard and the README disclosure): through `GoogleSearchAgentTool` on a Gemini 2.5 call it reported $0.0161853 = tokens $0.0021853 + $0.014, the Gemini 3.x per-query grounding rate applied to a 2.5 call; the published 2.5 fee is $35 per 1,000 grounded prompts ($0.035), so the figure is 0.44x of the expected $0.0371853.
 
 Scorer note: the two `..._15cases.md` files for the published tools were scored before a scorer bug fix (SCORING.md, scorer changelog); they are kept as scored, and the `..._scorerfix.md` files supersede them. Only adk-tracegauge 0.9.0 on G3r changed (FAIL to INCOMPLETE).
 

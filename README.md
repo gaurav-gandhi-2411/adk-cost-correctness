@@ -31,7 +31,7 @@ adk-cost-correctness run --adapter adk-finops
 
 No API key and no network: the model is a deterministic replay behind a real `InMemoryRunner`.
 
-## Scorecards (2026-09-21, google-adk 2.9.2)
+## Scorecards (2026-09-21 to 2026-10-05, google-adk 2.9.2)
 
 **15 graded cases** (the 12 below plus the realistic twins G1r-G3r, committed before scoring). The 12-case rows are kept as scored.
 
@@ -44,13 +44,22 @@ No API key and no network: the model is a deterministic replay behind a real `In
 | **15 cases:** adk-tracegauge | **0.9.1 published (PyPI)** | 6 | 9 (G1, G2, G3, G1r, G2r, G3r, T1, A1, M1); every real-shape grounded twin now prices its tokens and reports the tool-use tokens and the grounding fee as flagged | 0 |
 | **15 cases:** adk-finops | **0.6.1 published (PyPI)** | 4 | 5 (G1, G2, G1r, G2r, T1) | 6 (C1, C4, C5, G3r, A1, M2): G3r applies the Gemini 3.x $0.014 per-query rate to a Gemini 2.5 call (not reported upstream) |
 | **15 cases:** adk-finops | **0.6.3 published (PyPI)**, after issues #1-#3 replies | 5 | 5 (G1, G2, G1r, G2r, T1) | 5 (C1, C4, G3r, A1, M2): C5 moved FAIL→PASS (streaming fix, issue #3, confirmed); C1 and C4 unchanged (issues #1/#2 partial/not fixed — see `scorecards/README.md`) |
+| **15 cases:** adk-finops | **1.0.3 published (PyPI)**, latest release, scored 2026-10-05 | 5 | 5 (G1, G2, G1r, G2r, T1) | 5 (C1, C4, G3r, A1, M2): identical to 0.6.3 case for case, despite 9 releases in between. C1, C4 and M2 are cases the maintainer considers intended behavior; see the disclosure below |
 | **15 cases:** adk-tracegauge | dev build of PR #91 (**not published**) | 6 | 9 (all flagged) | 0 |
 
 Verbatim outputs are in `scorecards/`; the earlier five-case pass/fail scorecards are kept there,
 marked with the rule they used. A scorecard scores one version of each tool on these cases. It says nothing
 about the parts the suite does not test (budget guards, exporters, dashboards, most providers); see
-`docs/SCORING.md`. The three adk-finops failures found by the original five cases were reported to its
-maintainers on 2026-09-21 with repros; see `scorecards/README.md`.
+`docs/SCORING.md`.
+
+**Scored against google-adk 2.9.2 only.** The suite's own bound is `google-adk>=2.6.0,<2.12.0`. On google-adk
+2.10.0 and 2.11.0 the suite's own 32 tests and its reference adapter (15/15) pass (2026-10-05), but neither
+tool was re-scored there, so every scorecard above is a statement about 2.9.2.
+
+**What was reported to adk-finops, and what was not.** On 2026-09-21 the adk-finops maintainer was sent three
+issues with repros: **C1** (issue #1), **C4** (issue #2) and **C5** (issue #3). **A1, M2 and G3r are FAILs
+that were never reported**, and neither were the INCOMPLETE cases (G1, G2, G1r, G2r, T1). See
+`scorecards/README.md`.
 
 ## Disclosure: the author maintains one of the scored tools
 
@@ -68,8 +77,11 @@ done about it:
   (`docs/FIXTURE_PROVENANCE.md`).
 - **The scoring rule is written down** (`docs/SCORING.md`), including the rule that the author's tool would
   fail too if it guessed: a guessed price for an unknown model fails.
-- **Adapters read each tool the way its users see it,** and the failing tool's maintainers were shown each
-  failure with a minimal repro before anything was published.
+- **Adapters read each tool's reported total.** Exception: the adk-finops adapter sums its tracker's private
+  `_active_runs` attribute (the package has no public accessor) so that sub-agent sessions are counted; see
+  `src/adk_cost_correctness/adapters/adk_finops.py`.
+- **Only three of the failures were shown to the failing tool's maintainer before publication:** C1, C4 and
+  C5 (adk-finops issues #1-#3, 2026-09-21, each with a minimal repro). **A1, M2 and G3r were not reported.**
 
 **How the cases came about, with dates (all 2026-09-21).**
 - **14:56 IST, commit `44daee8`: the original five cases (C1-C5) were written, and they were chosen post hoc:**
@@ -89,6 +101,22 @@ was built to handle, and they were chosen after the author had run a hands-on co
 adk-finops fell short on them. The counter-cases reduce that bias but do not remove it: which counter-cases to write was still the
 author's choice. The suite says nothing about what adk-finops does that adk-tracegauge does not outside
 those (budget guards, exporters, a dashboard).
+
+**Two of the failures are disputed by the maintainer, so they are contested scoring rules, not settled
+defects.** The adk-finops owner closed both issues and described the behavior as intended (verbatim):
+
+- Issue #1, C1 (a model with no published price is reported at the fallback rate), 2026-09-23T04:04:00Z: "We are
+  not doing a pre-check whether model pricing is available or not, and output will reflect the tokens so user
+  can calculate with the available price or better way is to register it with the package as mentioned
+  [here](https://github.com/dmoonat/adk-finops/issues/1#issuecomment-5762512435)." The same mechanism produces
+  the M2 FAIL (claude-opus-5), which was not reported separately.
+- Issue #2, C4 (a doubly registered plugin counts every call twice), 2026-09-21T15:08:07Z: "This behavior is
+  expected as adk-finops is a adk plugin." and, 2026-09-23T04:06:39Z: "Expected behavior, please check above
+  [comment](https://github.com/dmoonat/adk-finops/issues/2#issuecomment-5762741336), thanks".
+
+The suite's rule (`docs/SCORING.md`) is that a cost tool must not report a dollar figure for a model with no
+published price, and must not silently double-count; adk-finops's maintainer disagrees. Read C1, C4 and M2
+as "this suite's rule says FAIL", not as "a bug". Issue #3 (C5, streaming) was acknowledged and fixed.
 
 None of that removes the conflict. Contest an adapter or a fixture by opening an issue with the arithmetic.
 
