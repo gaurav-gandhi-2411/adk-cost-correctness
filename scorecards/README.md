@@ -50,7 +50,7 @@ and the version tested:
   https://github.com/dmoonat/adk-finops/issues/2#issuecomment-5788531285.
 
 A scorecard is a statement about one version on one date; the 2026-09-21 (0.6.1) scorecards are kept as
-scored, and `2026-09-23_adk-finops_0.6.3_15cases.md` supersedes them for the current release.
+scored, and `2026-09-23_adk-finops_0.6.3_15cases.md` supersedes them for 0.6.3; `2026-10-05_adk-finops_1.0.3_15cases.md` is the scorecard for the current release (identical verdicts).
 
 **adk-finops G3r (2026-09-21), recorded here and NOT filed as an issue** (its first three issues were answered by the maintainer on 2026-09-21 and 2026-09-23; see the quotes in the 2026-10-05 scorecard and the README disclosure): through `GoogleSearchAgentTool` on a Gemini 2.5 call it reported $0.0161853 = tokens $0.0021853 + $0.014, the Gemini 3.x per-query grounding rate applied to a 2.5 call; the published 2.5 fee is $35 per 1,000 grounded prompts ($0.035), so the figure is 0.44x of the expected $0.0371853.
 
