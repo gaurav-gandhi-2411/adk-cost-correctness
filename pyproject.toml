@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=70", "wheel"]
+requires = ["setuptools>=77", "wheel"]  # >=77: SPDX `license` string and `license-files` (PEP 639)
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,6 +9,7 @@ description = "A tool-agnostic correctness suite for Google ADK cost-tracking pl
 requires-python = ">=3.10"
 readme = "README.md"
 license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "LICENSE-THIRD-PARTY"]
 dependencies = ["google-adk>=2.6.0"]
 
 [project.optional-dependencies]

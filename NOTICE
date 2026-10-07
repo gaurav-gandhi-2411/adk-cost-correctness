@@ -1,0 +1,12 @@
+adk-cost-correctness
+Copyright 2026 Gaurav Gandhi
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It contains no third-party source code. The third-party packages it imports at run time, the third-party
+text it quotes, and the published facts it relies on are listed, with their licences and the file each
+sits in, in LICENSE-THIRD-PARTY.
+
+Product and company names (Google, Gemini, Google ADK, OpenAI, GPT, Anthropic, Claude, adk-finops) are used
+only to say which software or model a case concerns. No affiliation with, or endorsement by, their owners
+is claimed.

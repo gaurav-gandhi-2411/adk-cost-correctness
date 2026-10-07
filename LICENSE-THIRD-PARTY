@@ -1,0 +1,81 @@
+# Third-party material in adk-cost-correctness
+
+The suite's own code, tests, case definitions and documentation are Apache-2.0 (`LICENSE`).
+This file lists everything in the repository that is not the author's own, what licence or status it has,
+whether attribution is required, and where the notice sits. It was written 2026-10-08 from the repository
+at commit `dfa3730` plus the licence metadata read from PyPI and GitHub that day (commands in the last
+section). It is a good-faith inventory, not legal advice.
+
+## 1. Software the suite imports but does not contain
+
+Nothing below is copied into this repository or into its wheel. `pyproject.toml` names them as
+dependencies; pip installs them separately, each under its own licence.
+
+| Software | Version read | Licence (source) | How the suite uses it | Attribution needed here | Where noted |
+|---|---|---|---|---|---|
+| google-adk (Google ADK) | 2.11.0 | Apache-2.0 (PyPI classifier; `google/adk-python` repo licence) | `harness.py` imports `LlmAgent`, `InMemoryRunner`, `App`, `Gemini`, `BaseLlm`, `LlmResponse` and the search tools, and subclasses `Gemini`/`BaseLlm` to replay recorded responses. No ADK source is copied. | No. Importing is not redistribution. | This file, section 1 |
+| google-genai | 2.29.0 | Apache-2.0 (PyPI `license_expression`; `googleapis/python-genai` repo licence) | `harness.py` imports `google.genai.types` | No | This file |
+| adk-tracegauge | 0.10.0 | Apache-2.0 (PyPI). The author's own package. | Optional dependency; `adapters/adk_tracegauge.py` imports its public plugin | No | This file |
+| adk-finops | 1.0.3 | Apache-2.0 (PyPI `license_expression`; `dmoonat/adk-finops` repo licence) | Optional dependency; `adapters/adk_finops.py` imports `CostTracker` and `FinOpsCostPlugin` and **reads one private attribute** (`CostTracker._active_runs`) because the package has no public accessor | No. **No adk-finops code is copied**: the adapter is 57 lines written for this suite. | This file; the private-attribute read is also disclosed in `README.md` |
+
+Code-copy check (run 2026-10-08): every non-comment source line of 45 or more characters in
+`src/adk_cost_correctness/**/*.py` (297 distinct lines) was compared by exact string match against the
+published wheels of google-adk 2.11.0, google-genai 2.29.0, adk-finops 1.0.3 and adk-tracegauge 0.10.0.
+Overlap: google-genai 0; adk-finops 1; adk-tracegauge 6; google-adk 4. Every overlapping line is an
+`import` statement of that package's own public name, or the signature `def main(argv: list[str] | None = None) -> int:`.
+Scope and limit: exact line matches in `src/` only; a reworded copy, or a copy in `tests/` or docs, would not
+show. The suite's `tests/` and docs were not part of this check.
+
+## 2. The recorded streaming fixture
+
+`src/adk_cost_correctness/data/real_stream_gemini-2.5-flash_2026-09-21.json` is a recording of a real
+Gemini call made by the author on 2026-09-21 (provenance in `docs/FIXTURE_PROVENANCE.md` and in the file's
+`_provenance` key).
+
+- **What it contains:** per streamed chunk, only `usage_metadata` (token counts), `partial`/`finish_reason`,
+  `model_version`, and `text_chars` (the *length* of the chunk's text). Checked by listing every key in the
+  file on 2026-10-08: there is no key that holds generated text. The only prose is the author's own
+  prompt, quoted inside `_provenance`.
+- **So:** no Gemini-generated text is redistributed, and the token counts are facts about one request.
+  Whose licence governs Gemini output text therefore does not arise for this repository. Licence: Apache-2.0
+  with the rest of the suite. Attribution: none required.
+- **Where noted:** `NOTICE`, this section, `docs/FIXTURE_PROVENANCE.md`.
+
+## 3. Vendor pricing figures
+
+The expected dollar amounts in `cases.py` (`RATES`, the grounding fees) are published list prices read from
+the vendors' own pages on 2026-09-21, with the URL beside each in `cases.py`'s docstring:
+
+- Google Gemini API (`ai.google.dev/gemini-api/docs/pricing`, `.../url-context`),
+- OpenAI (`developers.openai.com/api/docs/pricing.md`),
+- Anthropic (`platform.claude.com/docs/en/about-claude/pricing.md`).
+
+A price is a fact, not an expressive work; the suite copies the numbers and cites the page, and copies no
+page text, table layout or code. Under US copyright law facts are not protected (*Feist v. Rural*, 1991);
+that is the author's reading, not counsel's, and other jurisdictions differ (UNVERIFIED). No licence or
+attribution is required for the figures, but the source page and read-date are stated so each can be
+re-checked. Prices change; the figures are valid only as of the read date.
+
+## 4. Quoted text
+
+| Material | Where | Author | Licence status | Why it is here |
+|---|---|---|---|---|
+| Three short comments from the adk-finops maintainer on `dmoonat/adk-finops` issues #1 and #2 (2026-09-21 and 2026-09-23), quoted verbatim | `README.md` ("Disclosure"), `scorecards/` | the adk-finops maintainer (GitHub `dmoonat`) | Copyright in the comments stays with their author; the repository's Apache-2.0 covers the code, not the comments. Quoted briefly, attributed, with the comment URLs, for the purpose of criticism and commentary and so the maintainer's position is stated in their own words. | Fairness: the suite scores their tool and two of its FAILs are disputed. Verified verbatim against the GitHub API on 2026-10-08. Removal on the author's request. |
+| Short verbatim console or log lines printed by adk-finops 0.6.3 / 1.0.3 and adk-tracegauge during a scored run (e.g. the "applying fallback pricing" warning) | `scorecards/*.md` | the respective tool's authors | Apache-2.0 software output; a line or two, reproduced as evidence of the scored behaviour | A scorecard is the tool's verbatim output. |
+
+## 5. Names
+
+Google, Gemini, ADK, OpenAI, GPT, Anthropic, Claude and adk-finops are names of their owners' products,
+used to identify what a case concerns. No affiliation or endorsement is claimed (`NOTICE`).
+
+## How this inventory was produced
+
+```text
+PyPI JSON  https://pypi.org/pypi/<package>/json       version, license_expression, classifiers
+GitHub     gh api repos/google/adk-python               license.spdx_id = Apache-2.0
+           gh api repos/googleapis/python-genai         license.spdx_id = Apache-2.0
+           gh api repos/dmoonat/adk-finops              license.spdx_id = Apache-2.0
+           gh api repos/dmoonat/adk-finops/issues/{1,2,3}/comments   (quotes in section 4)
+fixture    python: list every key of the fixture JSON (section 2)
+overlap    exact-line comparison against the four published wheels (section 1)
+```

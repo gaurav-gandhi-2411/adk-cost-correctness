@@ -131,3 +131,9 @@ plugin that passes every case, and a naive one that fails each for the reason th
 prove both, so a scorecard cannot be an artefact of a badly written fixture.
 
 Scoring rule: `docs/SCORING.md`.
+
+## Licence
+
+Apache-2.0 for the suite's own code and text (`LICENSE`, `NOTICE`). Third-party software it imports, the quoted
+maintainer comments, the vendor price sources and the recorded fixture are inventoried in
+`LICENSE-THIRD-PARTY`.
