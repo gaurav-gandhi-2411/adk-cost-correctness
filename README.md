@@ -46,6 +46,7 @@ No API key and no network: the model is a deterministic replay behind a real `In
 | **15 cases:** adk-finops | **0.6.3 published (PyPI)**, after issues #1-#3 replies | 5 | 5 (G1, G2, G1r, G2r, T1) | 5 (C1, C4, G3r, A1, M2): C5 moved FAIL→PASS (streaming fix, issue #3, confirmed); C1 and C4 unchanged (issues #1/#2 partial/not fixed — see `scorecards/README.md`) |
 | **15 cases:** adk-finops | **1.0.3 published (PyPI)**, latest release, scored 2026-10-05 | 5 | 5 (G1, G2, G1r, G2r, T1) | 5 (C1, C4, G3r, A1, M2): identical to 0.6.3 case for case, despite 9 releases in between. C1, C4 and M2 are cases the maintainer considers intended behavior; see the disclosure below |
 | **15 cases:** adk-tracegauge | dev build of PR #91 (**not published**) | 6 | 9 (all flagged) | 0 |
+| **15 cases:** adk-tracegauge | **`main` `921ac68`, the 0.10.0 candidate (not published)**, scored 2026-10-07 | 11 (G1, G1r, G3r, A1, M1 moved up from INCOMPLETE) | 4 (G2, G2r, G3, T1) | 0. Matches the outcome pre-registered before implementation. Scored after suite commit `72ca8da` (replay models named `gemini-*` now subclass ADK's `Gemini` so a tool can read the backend); the same build on the unmodified suite scored 8 / 7 / 0. See the scorecard's disclosure |
 
 Verbatim outputs are in `scorecards/`; the earlier five-case pass/fail scorecards are kept there,
 marked with the rule they used. A scorecard scores one version of each tool on these cases. It says nothing
