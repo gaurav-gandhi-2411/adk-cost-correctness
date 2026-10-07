@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import io
+import os
 from typing import Any
 
 from google.adk.agents.llm_agent import LlmAgent
@@ -15,6 +16,7 @@ from google.adk.agents.run_config import (  # type: ignore[attr-defined]  # ADK 
 )
 from google.adk.apps.app import App
 from google.adk.models.base_llm import BaseLlm
+from google.adk.models.google_llm import Gemini
 from google.adk.models.llm_response import LlmResponse
 from google.adk.runners import InMemoryRunner
 from google.adk.tools.google_search_agent_tool import (
@@ -63,9 +65,21 @@ def _content(step: Step) -> Any:
 
 
 def _replay_model(steps: list[Step], *, name: str = "replay-fake") -> BaseLlm:
-    """Serves ``steps`` in order, one per model call."""
+    """Serves ``steps`` in order, one per model call.
 
-    class Replay(BaseLlm):
+    A model named ``gemini-*`` is a subclass of ADK's own ``Gemini`` class, so the app a tool sees
+    reports its backend exactly as a real Gemini API app does (``api_client.vertexai`` is False, read
+    from a client built offline from a placeholder key). Before this change (suite commit
+    ``eac41ec`` and earlier) every replay model was a bare ``BaseLlm`` with no ``api_client`` at all,
+    which no real Gemini deployment looks like; a tool that refuses to price a grounding fee unless
+    it can positively identify the Gemini API backend could therefore never be scored on it. The
+    same harness serves every adapter."""
+    base: type[BaseLlm] = BaseLlm
+    if name.startswith("gemini"):
+        base = Gemini
+        os.environ.setdefault("GOOGLE_API_KEY", "offline-replay-placeholder-key")
+
+    class Replay(base):  # type: ignore[valid-type, misc]
         model: str = name
         _n: int = 0
 
