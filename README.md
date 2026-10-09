@@ -48,6 +48,7 @@ No API key and no network: the model is a deterministic replay behind a real `In
 | **15 cases:** adk-tracegauge | dev build of PR #91 (**not published**) | 6 | 9 (all flagged) | 0 |
 | **15 cases:** adk-tracegauge | **`main` `921ac68`, the 0.10.0 candidate (not published)**, scored 2026-10-07 | 11 (G1, G1r, G3r, A1, M1 moved up from INCOMPLETE) | 4 (G2, G2r, G3, T1) | 0. Matches the outcome pre-registered before implementation. Scored after suite commit `72ca8da` (replay models named `gemini-*` now subclass ADK's `Gemini` so a tool can read the backend); the same build on the unmodified suite scored 8 / 7 / 0. See the scorecard's disclosure |
 | **15 cases:** adk-tracegauge | **0.10.0 published (PyPI)**, scored 2026-10-07 | 11 (same as the candidate row above) | 4 (G2, G2r, G3, T1) | 0. Every case's dollar figure identical to the `921ac68` candidate scorecard; scored on the downloaded wheel, suite `79d93d7` (harness unchanged since `72ca8da`) |
+| **15 cases:** adk-tracegauge | **0.10.1 published (PyPI)**, scored 2026-10-09 | 11 | 4 (G2, G2r, G3, T1) | 0. Identical to 0.10.0 case for case, dollar figures included, on google-adk 2.9.2 and 2.11.0; the shutdown handling it adds takes effect 2026-10-23, so the card is silent on that date onward. |
 
 Verbatim outputs are in `scorecards/`; the earlier five-case pass/fail scorecards are kept there,
 marked with the rule they used. A scorecard scores one version of each tool on these cases. It says nothing
