@@ -50,5 +50,8 @@ The adapter never sees the expected cost. Then:
 
 ## Standards
 
-Python 3.10+, `from __future__ import annotations`, `ruff check` + `ruff format`, `mypy --strict` on `src/`,
+Python 3.10+, `from __future__ import annotations`, `ruff check` + `ruff format`, `mypy --strict` on `src/`
+(configured in `pyproject.toml`, but not clean today: with google-adk 2.12.0, mypy 1.14.1 reports 2 errors,
+`harness.py:77` and `cli.py:42`, and mypy 2.4.0 reports the first; fixes are welcome, and the code runs and
+tests pass regardless),
 tests named `test_*.py`. Disclose any affiliation with a tool you score (see the README).
