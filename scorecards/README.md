@@ -19,6 +19,11 @@ names the tool version.
 | `2026-09-21_adk-finops_five-cases-pass-fail-rule.md` | adk-finops | 0.6.1 | superseded: pass/fail, original five cases | 2/5 |
 | `2026-09-23_adk-finops_0.6.3_15cases.md` | adk-finops | 0.6.3 PUBLISHED (retest after issue replies) | three outcomes, 15 cases | 5 PASS / 5 INCOMPLETE / 5 FAIL |
 | `2026-10-05_adk-finops_1.0.3_15cases.md` | adk-finops | 1.0.3 PUBLISHED (latest release) | three outcomes, 15 cases | 5 PASS / 5 INCOMPLETE / 5 FAIL (identical to 0.6.3) |
+| `2026-10-07_adk-tracegauge_main-921ac68_0.10.0-candidate_15cases.md` | adk-tracegauge | `main` `921ac68`, the 0.10.0 candidate (NOT published) | three outcomes, 15 cases | 11 PASS / 4 INCOMPLETE / 0 FAIL |
+| `2026-10-07_adk-tracegauge_0.10.0-published_15cases.md` | adk-tracegauge | 0.10.0 PUBLISHED wheel | three outcomes, 15 cases | 11 PASS / 4 INCOMPLETE / 0 FAIL (identical to the candidate) |
+| `2026-10-09_adk-tracegauge_0.10.1-published_15cases.md` | adk-tracegauge | 0.10.1 PUBLISHED wheel (`v0.10.1` = `0f709cf`) | three outcomes, 15 cases | 11 PASS / 4 INCOMPLETE / 0 FAIL (identical to 0.10.0) |
+| `2026-10-19_adk-tracegauge_0.10.1_adk-2.12.0_15cases.md` | adk-tracegauge | 0.10.1 PUBLISHED, google-adk 2.12.0 | three outcomes, 15 cases | 11 PASS / 4 INCOMPLETE / 0 FAIL (identical to the 2.9.2 card) |
+| `2026-10-19_adk-finops_1.0.3_adk-2.12.0_15cases.md` | adk-finops | 1.0.3 PUBLISHED, google-adk 2.12.0 | three outcomes, 15 cases | 5 PASS / 5 INCOMPLETE / 5 FAIL (identical to the 2.9.2 card) |
 
 The two superseded files are kept for history: they used the first rule and only the five cases chosen after
 the fact (see the README disclosure).

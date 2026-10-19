@@ -55,10 +55,14 @@ marked with the rule they used. A scorecard scores one version of each tool on t
 about the parts the suite does not test (budget guards, exporters, dashboards, most providers); see
 `docs/SCORING.md`.
 
-**Scored against google-adk 2.9.2 only.** The suite requires `google-adk>=2.6.0` with no upper bound (dropped
+**Which google-adk each scorecard is about.** The suite requires `google-adk>=2.6.0` with no upper bound (dropped
 2026-10-05, matching adk-tracegauge 0.9.3: a cap goes stale within weeks and its only effect was pip downgrading
-users). On google-adk 2.10.0 and 2.11.0 the suite's own 32 tests and its reference adapter (15/15) pass
-(2026-10-05), but neither tool was re-scored there, so every scorecard above is a statement about 2.9.2.
+users). Every row above was scored on google-adk 2.9.2, with these re-runs on newer releases: adk-tracegauge 0.10.1
+on 2.11.0 (2026-10-09), and both current releases, adk-tracegauge 0.10.1 and adk-finops 1.0.3, on 2.12.0, the
+newest release at the time (2026-10-19). All of those re-runs are row for row identical to the 2.9.2 scorecards,
+verdicts and dollar figures included (`scorecards/2026-10-19_*_adk-2.12.0_15cases.md`). The suite's own 32 tests
+and its reference adapter (15/15) pass on 2.10.0, 2.11.0 and 2.12.0. The older tool versions in the table were not
+re-scored on newer google-adk releases, so their rows are statements about 2.9.2.
 
 **What was reported to adk-finops, and what was not.** On 2026-09-21 the adk-finops maintainer was sent three
 issues with repros: **C1** (issue #1), **C4** (issue #2) and **C5** (issue #3). **A1, M2 and G3r are FAILs
