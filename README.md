@@ -4,6 +4,8 @@ A tool-agnostic correctness suite for Google ADK cost-tracking plugins: twelve d
 hand-computed expected costs and vendor-sourced prices, scored PASS / INCOMPLETE / FAIL. Any plugin can be
 scored by writing one small adapter.
 
+**Write-up:** [Measuring cost correctness in ADK agent cost tools](https://github.com/gaurav-gandhi-2411/adk-cost-correctness/blob/main/docs/measuring-cost-correctness.md) (what the suite found for two tools, and what it cannot tell you).
+
 | Case | What it checks | Added |
 |---|---|---|
 | C1 unknown model | A model with no published price is reported as unknown, not priced. A guess fails, even a close one. | original five |
