@@ -74,7 +74,9 @@ def _replay_model(steps: list[Step], *, name: str = "replay-fake") -> BaseLlm:
     which no real Gemini deployment looks like; a tool that refuses to price a grounding fee unless
     it can positively identify the Gemini API backend could therefore never be scored on it. The
     same harness serves every adapter."""
-    base: type[BaseLlm] = BaseLlm
+    # BaseLlm is abstract, but it is only ever subclassed below (Replay implements the abstract
+    # method), never instantiated, so mypy's type-abstract check does not apply.
+    base: type[BaseLlm] = BaseLlm  # type: ignore[type-abstract]
     if name.startswith("gemini"):
         base = Gemini
         os.environ.setdefault("GOOGLE_API_KEY", "offline-replay-placeholder-key")
