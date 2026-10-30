@@ -3,6 +3,11 @@
 One file per tool per run. Each is the verbatim output of `adk-cost-correctness run --adapter <name>` and
 names the tool version.
 
+From 2026-10-31 the output has a second header line, `Resolved: google-adk X, google-genai Y, python Z`, read
+from the installed packages. A new scorecard is run from `uv.lock` (`uv sync --frozen --all-extras`) and keeps
+that line. Files dated before then are kept exactly as scored: they have no such line, and their prose names
+the versions.
+
 | File | Tool | Version | Rule | Result |
 |---|---|---|---|---|
 | `2026-09-21_adk-tracegauge.md` | adk-tracegauge | 0.8.1 | three outcomes, 12 cases | 6 PASS / 5 INCOMPLETE / 1 FAIL |
