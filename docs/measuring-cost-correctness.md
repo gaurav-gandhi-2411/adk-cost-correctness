@@ -49,11 +49,14 @@ its cause against the API itself; the provenance is in `docs/FIXTURE_PROVENANCE.
 | adk-finops 1.0.3 (PyPI) | 5 | 5 | 5 | `2026-10-05_adk-finops_1.0.3_15cases.md` |
 
 All scored on google-adk 2.9.2. The re-scores on newer releases are identical, every case to the cent, verdicts
-and detail text included: adk-tracegauge 0.10.1 on google-adk 2.11.0 and on 2.12.0, and adk-finops 1.0.3 on 2.12.0
-(`2026-10-19_adk-tracegauge_0.10.1_adk-2.12.0_15cases.md`, `2026-10-19_adk-finops_1.0.3_adk-2.12.0_15cases.md`).
+and detail text included: adk-tracegauge 0.10.1 on google-adk 2.11.0, 2.12.0 and 2.13.0, and adk-finops 1.0.3 on
+2.12.0 and 2.13.0 (`2026-10-19_adk-tracegauge_0.10.1_adk-2.12.0_15cases.md`,
+`2026-10-19_adk-finops_1.0.3_adk-2.12.0_15cases.md`, `2026-10-26_adk-tracegauge_0.10.1_adk-2.13.0_15cases.md`,
+`2026-10-26_adk-finops_1.0.3_adk-2.13.0_15cases.md`).
 The other rows were not re-scored on newer releases. The 0.10.1 release adds
-`--version`, type information and a vendor-shutdown rule that takes effect on 2026-10-23, so its row is silent on
-behaviour after that date. The 0.10.0 row was scored on the published wheel; the same code scored identically (every case, to the cent) on the unreleased `main` build
+`--version`, type information and a vendor-shutdown rule that took effect on 2026-10-23. The 2.13.0 re-score ran
+on 2026-10-26, after that date, and is unchanged, because no case uses one of the four models shut down that day.
+The 0.10.0 row was scored on the published wheel; the same code scored identically (every case, to the cent) on the unreleased `main` build
 (`2026-10-07_adk-tracegauge_main-921ac68_0.10.0-candidate_15cases.md`) before release, against an outcome
 written down in advance.
 
