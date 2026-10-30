@@ -4,10 +4,15 @@ still fails" and the three-way PASS / INCOMPLETE / FAIL split."""
 
 from __future__ import annotations
 
+import importlib.metadata
+import json
+import platform
+
 import pytest
 
 from adk_cost_correctness.adapters.reference import NaiveAdapter, ReferenceAdapter
 from adk_cost_correctness.cases import Case, all_cases
+from adk_cost_correctness.cli import main
 from adk_cost_correctness.harness import run_all
 from adk_cost_correctness.scoring import Outcome, score
 
@@ -221,3 +226,28 @@ def test_the_naive_plugin_does_not_pass_the_cases_it_is_wrong_on():
         assert by_id[case_id].verdict != "PASS", case_id
     assert by_id["C4_double_registration"].verdict == "FAIL"
     assert "2.00x" in by_id["C4_double_registration"].reason
+
+
+# --- scorecard header -----------------------------------------------------------------------------
+
+
+def test_the_scorecard_header_names_the_installed_google_adk_and_tool(capsys):
+    assert main(["run", "--adapter", "reference"]) == 0
+    lines = capsys.readouterr().out.splitlines()
+    assert lines[0] == "Scorecard: in-repo"
+    adk = importlib.metadata.version("google-adk")
+    genai = importlib.metadata.version("google-genai")
+    assert lines[1] == (
+        f"Resolved: google-adk {adk}, google-genai {genai}, python {platform.python_version()}"
+    )
+
+
+def test_the_json_scorecard_carries_the_resolved_versions(capsys):
+    assert main(["run", "--adapter", "reference", "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["tool"] == "in-repo"
+    assert payload["resolved"] == {
+        "google-adk": importlib.metadata.version("google-adk"),
+        "google-genai": importlib.metadata.version("google-genai"),
+        "python": platform.python_version(),
+    }

@@ -40,9 +40,10 @@ Implement `CostPluginAdapter` (`src/adk_cost_correctness/adapters/base.py`):
 
 The adapter never sees the expected cost. Then:
 
-1. Add it to `ADAPTERS` in `cli.py` and an optional extra in `pyproject.toml`.
-2. Run `adk-cost-correctness run --adapter <name>` and save the verbatim output to
-   `scorecards/<date>_<name>.md` with the tool version.
+1. Add it to `ADAPTERS` in `cli.py` and an optional extra in `pyproject.toml`, then run `uv lock` and
+   commit `uv.lock` (CI's `uv lock --check` fails otherwise).
+2. Run `uv sync --frozen --all-extras` and `uv run --frozen adk-cost-correctness run --adapter <name>`, then
+   save the verbatim output, including the `Resolved:` header line, to `scorecards/<date>_<name>.md`.
 3. Check the sanity case (S0) passes: if not, the adapter is misreading the tool and the scorecard is
    invalid.
 4. If a case fails, reduce it to a minimal repro and, if it is a defect, report it to the tool's maintainers

@@ -4,12 +4,26 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import importlib.metadata
 import json
+import platform
 import sys
 from collections import Counter
 
 from .cases import all_cases
 from .harness import run_all
+
+# Read from the installed distributions at run time, so a scorecard names what actually ran rather than
+# what a command line asked for (pip and uv can both resolve something other than the requested range).
+RESOLVED_DISTRIBUTIONS = ("google-adk", "google-genai")
+
+
+def resolved_versions() -> dict[str, str]:
+    """The google-adk, google-genai and Python versions installed in this environment."""
+    versions = {d: importlib.metadata.version(d) for d in RESOLVED_DISTRIBUTIONS}
+    versions["python"] = platform.python_version()
+    return versions
+
 
 ADAPTERS = {
     "adk-tracegauge": ("adk_cost_correctness.adapters.adk_tracegauge", "AdkTracegaugeAdapter"),
@@ -34,10 +48,12 @@ def main(argv: list[str] | None = None) -> int:
     sanity = next(s for s in scores if s.case_id == "S0_sanity")
     graded = [s for s in scores if s.case_id != "S0_sanity"]
     tally = Counter(s.verdict for s in graded)
+    resolved = resolved_versions()
 
     if args.json:
         payload = {
             "tool": adapter.version(),
+            "resolved": resolved,
             "sanity_passed": sanity.passed,
             "tally": {v: tally.get(v, 0) for v in ("PASS", "INCOMPLETE", "FAIL")},
             "of": len(graded),
@@ -46,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(payload, indent=2))
     else:
         print(f"Scorecard: {adapter.version()}")
+        print("Resolved: " + ", ".join(f"{name} {v}" for name, v in resolved.items()))
         print(f"{'case':30} {'origin':9} {'result':11} detail")
         for s in scores:
             print(f"{s.case_id:30} {cases[s.case_id].origin:9} {s.verdict:11} {s.reason}")

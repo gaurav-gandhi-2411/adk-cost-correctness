@@ -26,10 +26,17 @@ figure, or any guess for an unpriceable component); see `docs/SCORING.md`.
 ## Run it
 
 ```bash
-pip install -e ".[adk-tracegauge,adk-finops]"
-adk-cost-correctness run --adapter adk-tracegauge
-adk-cost-correctness run --adapter adk-finops
+uv sync --frozen --all-extras --python 3.12
+uv run --frozen adk-cost-correctness run --adapter adk-tracegauge
+uv run --frozen adk-cost-correctness run --adapter adk-finops
 ```
+
+`uv.lock` pins google-adk, both tools and every transitive dependency, and CI installs from it, so a
+scorecard can be reproduced exactly. The scorecard's second line (`Resolved: google-adk ..., google-genai ...,
+python ...`) names what was actually installed. On Python 3.10 the lock resolves an older google-adk
+(2.11.0; later releases need 3.11+), so score on 3.11 or newer. To score a different version, update the lock
+in the same change (`uv lock --upgrade-package adk-tracegauge`, or `--upgrade-package google-adk`).
+`pip install -e ".[adk-tracegauge,adk-finops]"` still works, but resolves whatever is newest that day.
 
 No API key and no network: the model is a deterministic replay behind a real `InMemoryRunner`.
 
