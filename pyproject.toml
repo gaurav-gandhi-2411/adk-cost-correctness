@@ -6,10 +6,18 @@ build-backend = "setuptools.build_meta"
 name = "adk-cost-correctness"
 version = "0.1.0"
 description = "A tool-agnostic correctness suite for Google ADK cost-tracking plugins: unknown models, cached tokens, thinking tokens, double registration, streaming partials. Deterministic fixtures, hand-computed expected costs, one adapter per tool."
-requires-python = ">=3.10"
+requires-python = ">=3.11"  # 3.10 reached end of life on 2026-10-01 (PEP 619)
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE", "LICENSE-THIRD-PARTY"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
 dependencies = ["google-adk>=2.6.0"]
 
 [project.optional-dependencies]
@@ -31,7 +39,7 @@ adk_cost_correctness = ["data/*.json"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
